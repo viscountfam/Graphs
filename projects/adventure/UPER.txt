@@ -1,0 +1,29 @@
+Understand
+
+Given a pre-generated graph consisting of 500 rooms.
+fill out traversal_path that will allow a player to visit every room in the maze at least once
+
+important commands
+
+player.current_room.id - gets the id of the room the player is currently in
+player.current_room.get_exits() - returns a list of the directions that contain an get_exits
+player.travel(direction) - if the direction is valid it sets the players current room to the next 
+and you cannot move in that directions
+
+we want to create a graph of where each room leads
+
+this is what the initial entry looks like
+{
+    0: {'n': '?', 's': '?' 'w': '?', 'e': '?'}
+}
+
+when were done we want a list of 500 dictionaries
+[
+    0: {'n': 3 's': 5, 'w': 9, 'e': 4}
+    1: {'n': 3 's': 5, 'w': 9, 'e': 4}
+]
+
+Plan
+
+we could start by using a randomly selected direction
+and then switch to using a bfs to get the rest 
