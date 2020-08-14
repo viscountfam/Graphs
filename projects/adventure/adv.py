@@ -2,9 +2,10 @@ from room import Room
 from player import Player
 from world import World
 from pathlib import Path
-import random
+import random, sys
 from ast import literal_eval
 
+sys.setrecursionlimit(3000)
 class Queue():
     def __init__(self):
         self.queue = []
@@ -30,8 +31,8 @@ world = World()
 # map_file = "maps/main_maze.txt"
 initialPath = Path("projects/adventure")
 import_path = Path("projects/graph")
-# map_file = initialPath / "maps/main_maze.txt"
-map_file = initialPath / "maps/test_line.txt"
+map_file = initialPath / "maps/main_maze.txt"
+# map_file = initialPath / "maps/test_line.txt"
 
 # Loads the map into a dictionary
 room_graph = literal_eval(open(map_file, "r").read())
@@ -58,7 +59,6 @@ def traverse_maze(prev_room, current_room):
             return "w"
         elif direction == "w":
             return "e"
-    
     if current_room not in visited:
         potential_paths = player.current_room.get_exits()
         visited[current_room] = {}
@@ -69,6 +69,9 @@ def traverse_maze(prev_room, current_room):
         opposite_direction = traversal_path[-1]
     else:
         opposite_direction = None
+    
+    # visited[current_room][opposite(opposite_direction)] = prev_room
+    # visited[prev_room][opposite_direction] = current_room
 
     if opposite_direction == 'n':
         visited[current_room][opposite('n')] = prev_room
@@ -94,14 +97,16 @@ def traverse_maze(prev_room, current_room):
             
             player.travel(opposite(direction))
     
-    print(f"stack: {s}")
+    # print(f"stack: {s}")
     if len(s) > 0:
         next_room_info = s.pop()
+        # print("next_room_info", next_room_info)
+        # print("next_room_info type", type(next_room_info))
         last.append(next_room_info)
         current_room_info = next_room_info[0]
-        next_room_info = next_room_info[1]
         direction_info = next_room_info[2]
-        
+        next_room_info = next_room_info[1]
+
         if direction_info in visited[current_room] and visited[current_room][direction_info] == "?":
             traversal_path.append(direction_info)
             player.travel(direction_info)
@@ -109,9 +114,9 @@ def traverse_maze(prev_room, current_room):
         
         else:
             # this is where we'll run our bfs
-            def bfs():
+            def bfs(opposite_direction):
 
-
+                print(traversal_path)
                 selected_direction = opposite(opposite_direction)
                 
                 q = Queue()
@@ -147,11 +152,11 @@ def traverse_maze(prev_room, current_room):
                         for direction in reverse_path:
                             player.travel(opposite(direction))
                 
-                bfs()
+                bfs(opposite_direction)
 
-            bfs()
+            bfs(opposite_direction)
 traverse_maze(None, player.current_room.id)                       
-console.log(traversal_path)
+print(traversal_path)
                 
 
             
@@ -163,21 +168,21 @@ visited_rooms = set()
 player.current_room = world.starting_room
 visited_rooms.add(player.current_room)
 
-# for move in traversal_path:
-#     player.travel(move)
-#     visited_rooms.add(player.current_room)
+for move in traversal_path:
+    player.travel(move)
+    visited_rooms.add(player.current_room)
 
-# if len(visited_rooms) == len(room_graph):
-#     print(
-#         f"TESTS PASSED: {len(traversal_path)} moves, {len(visited_rooms)} rooms visited")
-# else:
-#     print("TESTS FAILED: INCOMPLETE TRAVERSAL")
-#     print(f"{len(room_graph) - len(visited_rooms)} unvisited rooms")
+if len(visited_rooms) == len(room_graph):
+    print(
+        f"TESTS PASSED: {len(traversal_path)} moves, {len(visited_rooms)} rooms visited")
+else:
+    print("TESTS FAILED: INCOMPLETE TRAVERSAL")
+    print(f"{len(room_graph) - len(visited_rooms)} unvisited rooms")
 
 
-# ######
+######
 # UNCOMMENT TO WALK AROUND
-# ######
+######
 # player.current_room.print_room_description(player)
 # while True:
 #     cmds = input("-> ").lower().split(" ")
